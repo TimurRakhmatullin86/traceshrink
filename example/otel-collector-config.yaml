@@ -7,22 +7,25 @@ receivers:
         endpoint: 0.0.0.0:4318
 
 processors:
+  # Step 1: Calculate cost from token counts (optional — skip if your spans already have cost)
+  costprocessor:
+    model_attribute: "gen_ai.request.model"
+    input_tokens_attribute: "gen_ai.usage.input_tokens"
+    output_tokens_attribute: "gen_ai.usage.output_tokens"
+    cache_read_tokens_attribute: "gen_ai.usage.cache_read_input_tokens"
+    reasoning_tokens_attribute: "gen_ai.usage.reasoning_tokens"
+    cost_attribute: "gen_ai.usage.cost_usd"
+
+  # Step 2: Sample traces based on cost, errors, and duration
   traceshrink:
-    # Keep traces where any span cost exceeds $0.10
     cost_threshold: 0.10
-    # Attribute name that holds the cost value (default: "llm.cost")
-    cost_attribute: "llm.cost"
-    # Always keep traces that contain errors
+    cost_attribute: "gen_ai.usage.cost_usd"
     keep_errors: true
-    # Keep traces slower than 5 seconds
     duration_threshold: 5s
-    # Keep traces with these marker attributes (any value)
     keep_attributes:
       - "important"
       - "billable"
-    # Wait 30s for all spans of a trace to arrive before deciding
     decision_wait: 30s
-    # Max traces held in memory
     num_traces: 100000
 
 exporters:
@@ -35,5 +38,5 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [traceshrink]
+      processors: [costprocessor, traceshrink]
       exporters: [otlp]

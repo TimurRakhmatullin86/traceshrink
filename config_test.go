@@ -19,8 +19,8 @@ func TestDefaultConfig(t *testing.T) {
 	if cfg.DurationThreshold != 5*time.Second {
 		t.Errorf("expected duration_threshold 5s, got %v", cfg.DurationThreshold)
 	}
-	if cfg.CostAttribute != "llm.cost" {
-		t.Errorf("expected cost_attribute 'llm.cost', got %q", cfg.CostAttribute)
+	if cfg.CostAttribute != "gen_ai.usage.cost_usd" {
+		t.Errorf("expected cost_attribute 'gen_ai.usage.cost_usd', got %q", cfg.CostAttribute)
 	}
 }
 

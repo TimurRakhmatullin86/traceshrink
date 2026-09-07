@@ -70,7 +70,7 @@ type spanOption func(ptrace.Span)
 
 func withCost(cost float64) spanOption {
 	return func(s ptrace.Span) {
-		s.Attributes().PutDouble("llm.cost", cost)
+		s.Attributes().PutDouble("gen_ai.usage.cost_usd", cost)
 	}
 }
 
@@ -254,21 +254,21 @@ func TestExtractCostFromDifferentTypes(t *testing.T) {
 		{
 			name: "double",
 			setAttr: func(s ptrace.Span) {
-				s.Attributes().PutDouble("llm.cost", 0.42)
+				s.Attributes().PutDouble("gen_ai.usage.cost_usd", 0.42)
 			},
 			expected: 0.42,
 		},
 		{
 			name: "int",
 			setAttr: func(s ptrace.Span) {
-				s.Attributes().PutInt("llm.cost", 5)
+				s.Attributes().PutInt("gen_ai.usage.cost_usd", 5)
 			},
 			expected: 5.0,
 		},
 		{
 			name: "string",
 			setAttr: func(s ptrace.Span) {
-				s.Attributes().PutStr("llm.cost", "0.99")
+				s.Attributes().PutStr("gen_ai.usage.cost_usd", "0.99")
 			},
 			expected: 0.99,
 		},
@@ -281,7 +281,7 @@ func TestExtractCostFromDifferentTypes(t *testing.T) {
 		{
 			name: "invalid string",
 			setAttr: func(s ptrace.Span) {
-				s.Attributes().PutStr("llm.cost", "not-a-number")
+				s.Attributes().PutStr("gen_ai.usage.cost_usd", "not-a-number")
 			},
 			expected: 0,
 		},

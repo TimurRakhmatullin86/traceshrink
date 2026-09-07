@@ -28,7 +28,7 @@ func (c *countingConsumer) ConsumeTraces(_ context.Context, td ptrace.Traces) er
 			spans := ilss.At(j).Spans()
 			c.spans.Add(int64(spans.Len()))
 			for k := 0; k < spans.Len(); k++ {
-				v, ok := spans.At(k).Attributes().Get("llm.cost")
+				v, ok := spans.At(k).Attributes().Get("gen_ai.usage.cost_usd")
 				if ok {
 					c.totalCost.Add(int64(v.Double() * 1000))
 				}
@@ -102,7 +102,7 @@ func TestSimulation1MSpans(t *testing.T) {
 			} else {
 				cost = rng.Float64() * 0.02
 			}
-			span.Attributes().PutDouble("llm.cost", cost)
+			span.Attributes().PutDouble("gen_ai.usage.cost_usd", cost)
 			inputCostMillicents += int64(cost * 1000)
 
 			if isSlow {

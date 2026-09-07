@@ -66,7 +66,7 @@ TraceShrink is an OTel Collector processor that sits in your trace pipeline. Ins
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `cost_threshold` | float | `0.10` | Keep traces where any span cost >= this (USD). 0 = disabled. |
-| `cost_attribute` | string | `"llm.cost"` | Span attribute name holding the cost value. |
+| `cost_attribute` | string | `"gen_ai.usage.cost_usd"` | Span attribute name holding the cost value. |
 | `keep_errors` | bool | `true` | Keep all traces containing an error span. |
 | `duration_threshold` | duration | `5s` | Keep traces exceeding this duration. 0 = disabled. |
 | `keep_attributes` | []string | `[]` | Keep traces with any of these attributes present. |
@@ -116,6 +116,33 @@ Then build:
 ```bash
 ocb --config builder-config.yaml
 ```
+
+## CostProcessor: Auto-Calculate LLM Costs
+
+Don't have cost attributes on your spans yet? The built-in `costprocessor` computes `gen_ai.usage.cost_usd` from token counts using LiteLLM's pricing database (2,700+ models).
+
+```yaml
+processors:
+  costprocessor:
+    model_attribute: "gen_ai.request.model"
+    input_tokens_attribute: "gen_ai.usage.input_tokens"
+    output_tokens_attribute: "gen_ai.usage.output_tokens"
+
+  traceshrink:
+    cost_threshold: 0.10
+    keep_errors: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [costprocessor, traceshrink]
+      exporters: [otlp]
+```
+
+Pipeline: `costprocessor` annotates each span with `$cost` → `traceshrink` samples based on it.
+
+Supports: `cache_read_input_tokens`, `reasoning_tokens`, fallback pricing for unknown models. **96ns per span.**
 
 ## vs Tail Sampling
 

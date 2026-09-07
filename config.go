@@ -11,7 +11,7 @@ type Config struct {
 	CostThreshold float64 `mapstructure:"cost_threshold"`
 
 	// CostAttribute is the span attribute name that holds the cost value.
-	// Defaults to "llm.cost" if empty.
+	// Defaults to "gen_ai.usage.cost_usd" if empty.
 	CostAttribute string `mapstructure:"cost_attribute"`
 
 	// KeepErrors: if true, always keep traces that contain at least one span with status ERROR.
@@ -36,7 +36,7 @@ type Config struct {
 func createDefaultConfig() *Config {
 	return &Config{
 		CostThreshold:     0.10,
-		CostAttribute:     "llm.cost",
+		CostAttribute:     "gen_ai.usage.cost_usd",
 		KeepErrors:        true,
 		DurationThreshold: 5 * time.Second,
 		KeepAttributes:    nil,
