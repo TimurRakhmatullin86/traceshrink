@@ -40,7 +40,7 @@ func generateBatch(batchSize int, costRate, errorRate float64) ptrace.Traces {
 		if rng.Float64() < costRate {
 			cost = 0.10 + rng.Float64()*2.0
 		}
-		span.Attributes().PutDouble("llm.cost", cost)
+		span.Attributes().PutDouble("gen_ai.usage.cost_usd", cost)
 
 		if rng.Float64() < errorRate {
 			span.Status().SetCode(ptrace.StatusCodeError)
@@ -86,7 +86,7 @@ func BenchmarkEvaluateDecision(b *testing.B) {
 	p := newTraceShrinkProcessor(zap.NewNop(), cfg, &nopConsumer{})
 
 	span := ptrace.NewSpan()
-	span.Attributes().PutDouble("llm.cost", 0.05)
+	span.Attributes().PutDouble("gen_ai.usage.cost_usd", 0.05)
 	span.Status().SetCode(ptrace.StatusCodeOk)
 	span.SetStartTimestamp(pcommon.Timestamp(1_000_000_000))
 	span.SetEndTimestamp(pcommon.Timestamp(1_100_000_000))

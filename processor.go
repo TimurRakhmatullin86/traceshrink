@@ -151,7 +151,7 @@ func (p *traceShrinkProcessor) hasAnyAttribute(span ptrace.Span) bool {
 func (p *traceShrinkProcessor) extractCost(span ptrace.Span) float64 {
 	attr := p.cfg.CostAttribute
 	if attr == "" {
-		attr = "llm.cost"
+		attr = "gen_ai.usage.cost_usd"
 	}
 	v, ok := span.Attributes().Get(attr)
 	if !ok {
