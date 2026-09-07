@@ -1,5 +1,9 @@
 # TraceShrink
 
+[![CI](https://github.com/TimurRakhmatullin86/traceshrink/actions/workflows/ci.yml/badge.svg)](https://github.com/TimurRakhmatullin86/traceshrink/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/timurrakhmatullin86/traceshrink.svg)](https://pkg.go.dev/github.com/timurrakhmatullin86/traceshrink)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 **Cost-aware trace sampling for OpenTelemetry Collector.**
 
 Random tail-sampling drops 99% of traces — including the $2 LLM calls and the errors that page you at 3 AM. TraceShrink keeps only what matters: expensive spans, errors, and slow requests.
@@ -8,6 +12,23 @@ Random tail-sampling drops 99% of traces — including the $2 LLM calls and the 
 1,000,000 spans → 20,125 spans (2% retained)
 98% storage reduction. 70% of total cost captured. 0% lost incidents.
 1.7M spans/sec throughput. 575ns per span.
+```
+
+## How It Works
+
+```
+┌──────────┐    ┌─────────────────────────────────────┐    ┌──────────┐
+│   OTLP   │───▶│         TraceShrink Processor        │───▶│  Tempo / │
+│ Receiver │    │                                       │    │  Jaeger  │
+└──────────┘    │  ┌─────────┐   ┌──────────────────┐  │    └──────────┘
+                │  │ Buffer   │──▶│ Evaluate per trace│  │
+                │  │ by trace │   │                    │  │
+                │  │ ID       │   │ cost >= $0.10? ──▶ KEEP
+                │  │          │   │ has error?     ──▶ KEEP
+                │  │          │   │ duration > 5s? ──▶ KEEP
+                │  │          │   │ otherwise      ──▶ DROP
+                │  └─────────┘   └──────────────────┘  │
+                └─────────────────────────────────────┘
 ```
 
 ## Quick Start
