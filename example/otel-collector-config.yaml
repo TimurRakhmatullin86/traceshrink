@@ -1,0 +1,39 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  traceshrink:
+    # Keep traces where any span cost exceeds $0.10
+    cost_threshold: 0.10
+    # Attribute name that holds the cost value (default: "llm.cost")
+    cost_attribute: "llm.cost"
+    # Always keep traces that contain errors
+    keep_errors: true
+    # Keep traces slower than 5 seconds
+    duration_threshold: 5s
+    # Keep traces with these marker attributes (any value)
+    keep_attributes:
+      - "important"
+      - "billable"
+    # Wait 30s for all spans of a trace to arrive before deciding
+    decision_wait: 30s
+    # Max traces held in memory
+    num_traces: 100000
+
+exporters:
+  otlp:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [traceshrink]
+      exporters: [otlp]
