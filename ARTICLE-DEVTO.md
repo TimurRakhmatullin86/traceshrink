@@ -1,4 +1,4 @@
-# I Built an OTel Processor That Saved Us $12k/Month on LLM Observability
+# I Built an OTel Processor That Can Save You $12k/Month on LLM Observability
 
 If you're running LLM-powered services in production, you know the problem: your observability bill is exploding.
 
