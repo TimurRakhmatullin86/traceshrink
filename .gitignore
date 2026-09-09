@@ -28,3 +28,10 @@ Thumbs.db
 
 # Build
 dist/
+
+# Secrets
+.env
+.env.*
+
+# Build
+/target
